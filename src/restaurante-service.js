@@ -1,44 +1,40 @@
+const Restaurante = require('./models/restaurante');
 const restaurantes = [];
 let id = 1;
 
-const salvar = ({ restaurante }) => {
-    restaurante.id = id++;
-    restaurantes.push(restaurante);
-    return restaurante;
+const salvar = async (restaurante) => {
+    const restauranteDb = await Restaurante.create(restaurante);
+    return restauranteDb;
 }
 
-const editar = (id, { restaurante }) => {
-    let restauranteBanco = buscarPorId(id);
+const editar = async (id, restaurante) => {
+    let restauranteBanco = await buscarPorId(id);
     if (!restauranteBanco) {
         return null;
     }
-    const indice = restaurantes.indexOf(restauranteBanco);
-    restaurantes.splice(indice, 1);
-    restauranteBanco = { ...restaurante, id };
-    restaurantes.push(restauranteBanco);
+    restauranteBanco = await Restaurante.findByIdAndUpdate(id,restaurante);
     return restauranteBanco;
 }
 
-const excluir = id => {
-    const restaurante = buscarPorId(id);
+const excluir = async id => {
+    const restaurante = await buscarPorId(id);
     if (!restaurante) {
         return null;
     }
-    const indice = restaurantes.indexOf(restaurante);
-    restaurantes.splice(indice, 1);
+    await Restaurante.findByIdAndDelete(id);
     return "restaurante excluido com sucesso!";
 }
 
-const buscarPorId = id => {
-    const restaurante = restaurantes.find(x => x.id == id);
+const buscarPorId = async id => {
+    const restaurante = await Restaurante.findById(id);
     if (!restaurante) {
         return null;
     }
     return restaurante;
 }
 
-const buscarTodos = () => {
-    return restaurantes;
+const buscarTodos = async () => {
+    return await Restaurante.find();
 }
 
 module.exports = { salvar, editar, excluir, buscarPorId, buscarTodos };
